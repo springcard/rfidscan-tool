@@ -1,0 +1,10 @@
+# Copy this udev with "sudo cp 51-rfidscan.rules /etc/udev/rules.d/"
+# Edit it to suit your type of Linux. It's currently set up for modern Ubuntu
+# When done, do "sudo udevadm control --reload-rules"
+# and unplug and replug in the blink1 device.
+# Note the hex values for vid & pid must be lower-case
+# SYSFS{idVendor}=="1c34", SYSFS{idProduct}=="7241", MODE="666"
+# ATTRS{idVendor}=="1c34", ATTRS{idProduct}=="7241", SUBSYSTEMS=="usb", ACTION=="add", MODE="0666", GROUP="plugdev"
+# modern ubuntu
+SUBSYSTEM=="input", GROUP="input", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1c34", ATTRS{idProduct}=="7241", MODE:="666", GROUP="plugdev"
