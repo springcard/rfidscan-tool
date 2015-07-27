@@ -7,14 +7,15 @@
 #include <string.h>    // for memset(), strcmp(), et al
 #include <stdlib.h>
 #include <stdint.h>
-#include <getopt.h>    // for getopt_long()
 
 #ifndef WIN32
+#include <getopt.h>    // for getopt_long()
 #include <unistd.h>
 #define stricmp strcasecmp
 #endif
 
 #ifdef WIN32
+#include "windows/libs/getopt.h"
 #include <Windows.h>
 #define sleep(s) Sleep(1000*s)
 #endif

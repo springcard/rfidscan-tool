@@ -1,11 +1,11 @@
-#include "hidapi.h"
+#include "hidapi/hidapi/hidapi.h"
 
 int rfidscan_enumerate(void)
 {
   LOG("rfidscan_enumerate!\n");
   rfidscan_cached_count = 0;
   rfidscan_enumerateByVidPid(0x1C34, 0x7241); /* Prox'N'Roll RFID Scanner */
-  rfidscan_enumerateByVidPid(0x1C34, 0xB241); /* Prox'N'Roll RFID Scanner HSP */    
+  rfidscan_enumerateByVidPid(0x1C34, 0x9241); /* Prox'N'Roll RFID Scanner HSP */    
   return rfidscan_cached_count;
 }
 
