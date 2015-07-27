@@ -154,7 +154,7 @@ int rfidscan_exchange(rfidscan_device* dev, unsigned char *buf, int len)
     return rc;
   }
   
-  rfidscan_sleep( 5 ); //FIXME:
+  rfidscan_sleep(120); //FIXME:
 
   LOG("get_feature_report\n");
   

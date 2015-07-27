@@ -22,6 +22,8 @@
 
 #include "rfidscan-lib.h"
 
+int rfidscan_verbose = 0;
+
 static const uint8_t ACTION_GET_PROTOCOL_INFO = 0x01;
 static const uint8_t ACTION_GET_VARIABLE = 0x02;
 static const uint8_t GET_VARIABLE_ITEM_LAST_ERROR = 0x01;
@@ -61,8 +63,7 @@ static int rfidscan_cached_count = 0;  // number of cached entities
 static int rfidscan_enable_degamma = 1;
 
 // set in Makefile to debug HIDAPI stuff
-extern int verbose;
-#define LOG(...) if (verbose) fprintf(stderr, __VA_ARGS__)
+#define LOG(...) if (rfidscan_verbose) fprintf(stderr, __VA_ARGS__)
 
 // addresses in EEPROM for mk1 blink(1) devices
 #define rfidscan_eeaddr_osccal        0

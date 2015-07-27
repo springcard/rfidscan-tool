@@ -195,6 +195,9 @@ const char*  rfidscan_getSerialForDev(rfidscan_device* dev);
  */
 int          rfidscan_getCachedCount(void);
 
+
+extern int rfidscan_verbose;
+
 #ifdef __cplusplus
 }
 #endif

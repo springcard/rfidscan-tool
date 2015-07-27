@@ -18,6 +18,9 @@
   <ItemGroup>
     <Library Include="..\hidapi\windows\Release\hidapi.lib" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\rfidscan-lib-lowlevel-hidapi.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{19A9BE80-505A-4246-99FC-618DB30B5E4B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

@@ -28,4 +28,9 @@
   <ItemGroup>
     <Library Include="..\hidapi\windows\Release\hidapi.lib" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\rfidscan-lib-lowlevel-hidapi.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

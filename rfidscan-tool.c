@@ -21,7 +21,6 @@
 
 #include "rfidscan-lib.h"
 
-int verbose = 0;
 int quiet = 0;
 
 // printf that can be shut up
@@ -176,35 +175,42 @@ static int do_get_version(rfidscan_device *dev)
   return rc;
 }
 
-//
-int do_read(rfidscan_device *dev, uint8_t addr, int show_empty)
+void show(uint8_t addr, uint8_t data[], int size, int show_empty)
 {
-  uint8_t data[256];
-  int rc, i;
+  int i;
 
-  rc = rfidscan_RegisterRead(dev, addr, data, sizeof(data));
-  if (rc < 0)
-    return rc;
-
-  if (rc > 0)
+  if (size > 0)
   {
     printf("%02X : ", addr);
 
     if ((addr == 0x55) || (addr == 0x56) || (addr == 0x6F))
     {
-      for (i=0; i<rc; i++)
+      for (i=0; i<size; i++)
         printf("XX");
     } else
     {
-      for (i=0; i<rc; i++)
+      for (i=0; i<size; i++)
         printf("%02X", data[i]);
     }
     printf("\n");
   } else
-  if ((rc == 0) && show_empty)
+  if ((size == 0) && show_empty)
   {
     printf("%02X : (empty)\n", addr);
   }
+}
+
+//
+int do_read(rfidscan_device *dev, uint8_t addr, int show_empty)
+{
+  uint8_t data[256];
+  int rc;
+
+  rc = rfidscan_RegisterRead(dev, addr, data, sizeof(data));
+  if (rc < 0)
+    return rc;
+
+  show(addr, data, rc, show_empty);
 
   return rc;
 }
@@ -212,10 +218,62 @@ int do_read(rfidscan_device *dev, uint8_t addr, int show_empty)
 //
 int do_write(rfidscan_device *dev, uint8_t addr, uint8_t *data, size_t size)
 {
-  int rc = rfidscan_RegisterWrite(dev, addr, data, size);
+  uint8_t r_data[256];
+  int rc, retry;
 
-  if (rc >= 0)
-    rc = do_read(dev, addr, 1);
+  rc = rfidscan_RegisterRead(dev, addr, r_data, sizeof(r_data));
+  if (rc < 0)
+    return rc;
+
+  if ((rc == size))
+  {
+    if ((size == 0) || !memcmp(data, r_data, size))
+    {
+      /* Already the expected value */
+      show(addr, r_data, rc, TRUE);
+      return rc;
+    }
+  }
+
+  for (retry=3; retry>=0; retry--)
+  {
+    rc = rfidscan_RegisterWrite(dev, addr, data, size);
+    if (rc < 0)
+      return rc;
+
+    rfidscan_sleep(120);
+
+    rc = rfidscan_RegisterRead(dev, addr, r_data, sizeof(r_data));
+    if (rc < 0)
+      return rc;
+
+    if (rc != size)
+    {
+      if (!retry)
+      {
+        printf("%02X : write failed\n", addr);      
+        return -1;
+      }
+      continue;
+    }
+
+    if (size)
+    {
+      if (memcmp(r_data, data, size))
+      {
+        if (!retry)
+        {
+          printf("%02X : write error\n", addr);
+          return -1;
+        }
+        continue;
+      }
+    }
+
+    break;
+  }
+
+  show(addr, r_data, rc, TRUE);
 
   return rc;
 }
@@ -521,9 +579,9 @@ int main(int argc, char** argv)
         else quiet = strtol(optarg,NULL,0);
         break;
       case OPT_VERBOSE:
-        if (optarg==NULL) verbose++;
-        else verbose = strtol(optarg,NULL,0);
-        if (verbose > 3)
+        if (optarg==NULL) rfidscan_verbose++;
+        else rfidscan_verbose = strtol(optarg,NULL,0);
+        if (rfidscan_verbose > 3)
           fprintf(stderr,"going REALLY verbose\n");
         break;
       case OPT_DEVICE:
@@ -704,6 +762,7 @@ int main(int argc, char** argv)
           while (fgets(buffer, sizeof(buffer), fp))
           {
             strtok(buffer, "#;\r\n");
+
             if (!stricmp(buffer, "[general]"))
             {
               raw_section = 0;
